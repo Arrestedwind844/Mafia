@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фотогалерея</title>
+    <link href="https://fonts.googleapis.com/css2?family=Impact&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="rules.css">
+    <style>
+        /* Стиль для скрытия элемента, сохраняя его место */
+        .navigation-buttons button.hidden {
+            visibility: hidden; /* Скрывает элемент, но сохраняет его место в макете */
+        }
+
+        /* Стиль для нумерации страниц */
+        .page-counter {
+            text-align: center;
+            margin-top: 10px; /* Отступ сверху от кнопок */
+            font-size: 1.2em; /* Размер шрифта */
+            color: #333; /* Цвет текста */
+            font-family: Arial, sans-serif; /* Шрифт */
+        }
+
+        /* Обновленные стили для контейнера кнопок */
+        .navigation-buttons {
+            display: flex; /* Делаем контейнер флекс-контейнером */
+            justify-content: center; /* Центрируем элементы по горизонтали */
+            align-items: center; /* Выравниваем элементы по вертикали (если их высота разная) */
+            gap: 20px; /* Добавляем расстояние между кнопками. Настройте по желанию. */
+            margin-top: 20px; /* Отступ сверху, чтобы кнопки не прилипали к счетчику страниц */
+            /* Если кнопки всё ещё "съезжают", возможно, вам нужно задать фиксированную высоту
+               для .container или .navigation-buttons, или убедиться, что они находятся
+               внутри основного потока документа. */
+        }
+
+        /* Убедимся, что кнопки имеют одинаковый размер, чтобы замещение выглядело плавно */
+        .navigation-buttons .play-button {
+            min-width: 100px; /* Задайте минимальную ширину для кнопок, чтобы они не скакали */
+            text-align: center; /* Центрируем текст внутри кнопок */
+            padding: 10px 20px; /* Пример отступов для кнопок */
+        }
+
+        /* Убираем абсолютное позиционирование для кнопок, которое вызывало проблему */
+        /* .navigation-buttons .play-button {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        } */ /* УДАЛИТЕ ЭТОТ БЛОК ИЗ ВАШЕГО CSS */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-display">
+            <img id="currentImage" src="photo/1.jpg" alt="Фото 1">
+        </div>
+
+        <div class="page-counter" id="pageCounter">
+        </div>
+
+        <div class="navigation-buttons">
+            <button id="prevButton" class="play-button">Назад</button>
+            <div style="position: relative; width: 100px; height: 40px;">
+                <button id="nextButton" class="play-button" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">Далее</button>
+                <button id="homeButton" class="play-button hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">Домой</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const images = [];
+        for (let i = 1; i <= 14; i++) {
+            images.push(`photo/${i}.jpg`);
+        }
+
+        let currentImageIndex = 0;
+        const currentImageElement = document.getElementById('currentImage');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const homeButton = document.getElementById('homeButton');
+        const pageCounterElement = document.getElementById('pageCounter'); // Получаем элемент для счетчика
+
+        // *** ВАЖНО: ЗАМЕНИТЕ ЭТОТ URL НА АДРЕС ВАШЕЙ НАЧАЛЬНОЙ СТРАНИЦЫ ***
+        const targetUrl = 'index.html'; // Пример: 'index.html', 'home.html'
+
+        /**
+         * Обновляет отображаемое изображение, состояние кнопок и нумерацию страниц.
+         */
+        function updateImageAndButtons() {
+            currentImageElement.src = images[currentImageIndex];
+            currentImageElement.alt = `Фото ${currentImageIndex + 1}`;
+
+            // Обновляем нумерацию страниц
+            pageCounterElement.textContent = `${currentImageIndex + 1} / ${images.length}`;
+
+            // Управление видимостью кнопки "Далее" и новой кнопки "Домой"
+            if (currentImageIndex === images.length - 1) {
+                nextButton.classList.add('hidden');     // Скрываем кнопку "Далее"
+                homeButton.classList.remove('hidden'); // Показываем кнопку "Домой"
+            } else {
+                nextButton.classList.remove('hidden'); // Показываем кнопку "Далее"
+                homeButton.classList.add('hidden');    // Скрываем кнопку "Домой", когда не на последней картинке
+            }
+        }
+
+        /**
+         * Обработчик нажатия кнопки "Назад".
+         */
+        prevButton.addEventListener('click', () => {
+            if (currentImageIndex === 0) {
+                // Если мы на первой картинке (индекс 0), перенаправляем на другую страницу.
+                window.location.href = targetUrl;
+            } else {
+                // Иначе, просто переходим к предыдущей картинке в галерее.
+                currentImageIndex--;
+                updateImageAndButtons();
+            }
+        });
+
+        /**
+         * Обработчик нажатия кнопки "Далее".
+         */
+        nextButton.addEventListener('click', () => {
+            if (currentImageIndex < images.length - 1) {
+                currentImageIndex++;
+                updateImageAndButtons();
+            }
+        });
+
+        // Обработчик для новой кнопки "Домой"
+        homeButton.addEventListener('click', () => {
+            window.location.href = targetUrl; // Перенаправляем на начальную страницу
+        });
+
+        // Инициализация галереи при полной загрузке страницы.
+        document.addEventListener('DOMContentLoaded', updateImageAndButtons);
+    </script>
+</body>
+</html>
